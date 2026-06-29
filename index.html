@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mastishk — Brain-AI Research Initiative</title>
+<meta name="description" content="An independent undergraduate research initiative exploring artificial intelligence, medical imaging, and neuroscience."/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #CCCAC5;
+  --bg-deep:    #B8B4AD;
+  --text:       #1E1E1C;
+  --text-mid:   #4A4A47;
+  --text-dim:   #7A7773;
+  --shadow-l:   #E8E5DF;
+  --shadow-d:   #A09D97;
+  --nm-raise:   6px 6px 14px #A09D97, -6px -6px 14px #E8E5DF;
+  --nm-inset:   inset 4px 4px 10px #A09D97, inset -4px -4px 10px #E8E5DF;
+  --nm-raise-s: 3px 3px 8px #A09D97, -3px -3px 8px #E8E5DF;
+  --nm-inset-s: inset 2px 2px 6px #A09D97, inset -2px -2px 6px #E8E5DF;
+  --r: 14px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 17px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bg-deep); border-radius: 3px; }
+
+/* ── Nav ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 3rem; height: 68px;
+  background: var(--bg);
+  box-shadow: 0 2px 12px #A09D9760;
+}
+.nav-logo {
+  font-family: Georgia, serif; font-size: 1.15rem; font-weight: normal;
+  letter-spacing: 0.06em; color: var(--text); text-decoration: none; font-style: italic;
+}
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a {
+  font-family: Georgia, serif; font-size: 0.88rem; color: var(--text-dim);
+  text-decoration: none; letter-spacing: 0.04em; transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+
+/* ── Layout ── */
+section { padding: 7rem 0; }
+.wrap { max-width: 680px; margin: 0 auto; padding: 0 2rem; }
+
+/* ── Hero ── */
+#home { padding-top: 0; padding-bottom: 0; position: relative; min-height: 100vh; display: flex; align-items: center; }
+
+#brain-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.hero-inner {
+  position: relative; z-index: 2;
+  max-width: 680px; margin: 0 auto; padding: 0 2rem;
+  padding-top: 6rem;
+}
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  font-family: Georgia, serif; font-size: 0.78rem; font-style: italic;
+  color: var(--text-dim); letter-spacing: 0.06em; margin-bottom: 2.5rem;
+}
+.dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--bg); box-shadow: var(--nm-raise-s); position: relative;
+}
+.dot::after {
+  content: ''; position: absolute; inset: 2px; border-radius: 50%;
+  background: var(--text-mid); animation: blink 2.5s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+h1 {
+  font-family: Georgia, serif; font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: normal; line-height: 1.18; letter-spacing: -0.02em;
+  color: var(--text); margin-bottom: 1.75rem; max-width: 560px;
+}
+h1 em { font-style: italic; color: var(--text-mid); }
+
+.hero-sub {
+  font-size: 1.05rem; color: var(--text-mid);
+  max-width: 500px; margin-bottom: 3rem; line-height: 1.8;
+}
+
+.hero-actions { display: flex; gap: 1.1rem; flex-wrap: wrap; margin-bottom: 5rem; }
+
+.btn {
+  font-family: Georgia, serif; font-size: 0.88rem; letter-spacing: 0.04em;
+  font-style: italic; padding: 0.7rem 1.6rem; border-radius: var(--r);
+  text-decoration: none; border: none; cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s; display: inline-block;
+}
+.btn-raised { background: var(--bg); color: var(--text); box-shadow: var(--nm-raise); }
+.btn-raised:hover { box-shadow: 4px 4px 10px #A09D97, -4px -4px 10px #E8E5DF; transform: translateY(-1px); }
+.btn-raised:active { box-shadow: var(--nm-inset-s); transform: none; }
+.btn-flat { background: transparent; color: var(--text-dim); box-shadow: none; }
+.btn-flat:hover { color: var(--text); }
+
+/* canvas hint */
+.canvas-hint {
+  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  font-family: Georgia, serif; font-size: 0.7rem; font-style: italic;
+  color: var(--text-dim); letter-spacing: 0.06em; text-align: center;
+  animation: fadeUpDown 3s ease-in-out infinite; z-index: 2;
+}
+@keyframes fadeUpDown { 0%,100%{opacity:0.5;transform:translateX(-50%) translateY(0)} 50%{opacity:1;transform:translateX(-50%) translateY(-4px)} }
+
+/* ── Section pieces ── */
+.label {
+  font-family: Georgia, serif; font-size: 0.72rem; font-style: italic;
+  color: var(--text-dim); letter-spacing: 0.1em; text-transform: lowercase;
+  margin-bottom: 2.5rem; display: block;
+}
+h2 {
+  font-family: Georgia, serif; font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: normal; line-height: 1.25; letter-spacing: -0.015em;
+  color: var(--text); margin-bottom: 1.25rem;
+}
+h3 {
+  font-family: Georgia, serif; font-size: 1.1rem; font-weight: normal;
+  font-style: italic; color: var(--text); margin-bottom: 0.6rem;
+}
+p { color: var(--text-mid); }
+
+/* ── Status ── */
+.status-block {
+  background: var(--bg); box-shadow: var(--nm-inset); border-radius: var(--r);
+  padding: 2rem 2.5rem; max-width: 680px; margin: 0 auto;
+}
+.status-block .label { margin-bottom: 0.75rem; }
+.status-block p { font-size: 0.95rem; color: var(--text-mid); font-style: italic; }
+
+/* ── Philosophy ── */
+.philo-list { display: flex; flex-direction: column; }
+.philo-item {
+  padding: 2rem 0; border-bottom: 1px solid var(--bg-deep);
+  display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem; align-items: start;
+}
+.philo-item:last-child { border-bottom: none; }
+.philo-num {
+  font-family: Georgia, serif; font-size: 0.72rem; font-style: italic;
+  color: var(--text-dim); letter-spacing: 0.08em; padding-top: 0.35rem;
+}
+.philo-item p { font-size: 0.95rem; margin-top: 0.35rem; }
+
+/* ── Research ── */
+.inset-box {
+  background: var(--bg); box-shadow: var(--nm-inset);
+  border-radius: var(--r); padding: 2.5rem; margin-top: 2.5rem;
+}
+.research-tag {
+  display: inline-block; font-family: Georgia, serif; font-size: 0.7rem;
+  font-style: italic; letter-spacing: 0.06em; color: var(--text-dim);
+  background: var(--bg); box-shadow: var(--nm-raise-s);
+  padding: 0.25rem 0.75rem; border-radius: 100px; margin-bottom: 1.5rem;
+}
+.work-list { list-style: none; margin-top: 1rem; display: flex; flex-direction: column; gap: 0.65rem; }
+.work-list li {
+  font-family: Georgia, serif; font-size: 0.93rem; font-style: italic;
+  color: var(--text-mid); padding-left: 1.1rem; position: relative;
+}
+.work-list li::before { content: '—'; position: absolute; left: 0; color: var(--text-dim); }
+.note {
+  margin-top: 1.75rem; font-family: Georgia, serif; font-size: 0.82rem;
+  font-style: italic; color: var(--text-dim);
+  padding-top: 1.25rem; border-top: 1px solid var(--bg-deep);
+}
+
+/* ── MRI Visualiser ── */
+.mri-wrap {
+  margin-top: 3.5rem;
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+}
+.mri-label-row {
+  display: flex; align-items: center; gap: 1rem; width: 100%; max-width: 360px; justify-content: space-between;
+}
+.mri-label-row span {
+  font-family: Georgia, serif; font-size: 0.7rem; font-style: italic;
+  color: var(--text-dim); letter-spacing: 0.06em;
+}
+
+#mri-canvas-wrap {
+  background: var(--bg); box-shadow: var(--nm-inset);
+  border-radius: 50%; width: 260px; height: 260px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: crosshair; position: relative; overflow: hidden;
+}
+#mri-canvas { border-radius: 50%; display: block; }
+
+.mri-controls {
+  display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center;
+}
+.mri-btn {
+  font-family: Georgia, serif; font-size: 0.75rem; font-style: italic;
+  color: var(--text-dim); background: var(--bg); box-shadow: var(--nm-raise-s);
+  border: none; border-radius: 100px; padding: 0.35rem 0.9rem;
+  cursor: pointer; transition: box-shadow 0.15s; letter-spacing: 0.04em;
+}
+.mri-btn:hover { box-shadow: var(--nm-inset-s); color: var(--text); }
+.mri-btn.active { box-shadow: var(--nm-inset-s); color: var(--text); }
+
+/* ── Areas ── */
+.areas { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2.5rem; }
+.area {
+  font-family: Georgia, serif; font-size: 0.85rem; font-style: italic;
+  color: var(--text-mid); background: var(--bg); box-shadow: var(--nm-raise-s);
+  padding: 0.45rem 1.1rem; border-radius: 100px; cursor: default;
+  transition: box-shadow 0.18s, transform 0.18s;
+}
+.area:hover { box-shadow: var(--nm-inset-s); transform: translateY(1px); }
+
+/* ── About ── */
+.quote-block {
+  margin: 2.5rem 0; background: var(--bg); box-shadow: var(--nm-inset);
+  border-radius: var(--r); padding: 2rem 2.5rem;
+  font-family: Georgia, serif; font-size: 1.15rem; font-style: italic;
+  color: var(--text-mid); line-height: 1.65;
+}
+.person-row {
+  display: flex; align-items: flex-start; gap: 1.5rem;
+  margin-top: 3rem; padding-top: 2.5rem; border-top: 1px solid var(--bg-deep);
+}
+.avatar {
+  width: 52px; height: 52px; flex-shrink: 0; border-radius: 50%;
+  background: var(--bg); box-shadow: var(--nm-raise);
+  display: flex; align-items: center; justify-content: center;
+  font-family: Georgia, serif; font-size: 1rem; font-style: italic; color: var(--text-mid);
+}
+.person-row small {
+  display: block; font-family: Georgia, serif; font-size: 0.72rem;
+  font-style: italic; color: var(--text-dim); letter-spacing: 0.06em; margin-bottom: 0.3rem;
+}
+.person-row p { font-size: 0.9rem; margin-top: 0.4rem; }
+
+.pub-empty { margin-top: 3rem; padding-top: 2.5rem; border-top: 1px solid var(--bg-deep); }
+.pub-empty p { font-family: Georgia, serif; font-style: italic; font-size: 0.93rem; color: var(--text-dim); max-width: 440px; }
+
+/* ── Contact ── */
+.contact-items { display: flex; flex-direction: column; gap: 1rem; margin-top: 2.5rem; }
+.contact-link {
+  display: flex; align-items: center; gap: 1.25rem;
+  background: var(--bg); box-shadow: var(--nm-raise); border-radius: var(--r);
+  padding: 1.35rem 1.75rem; text-decoration: none;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.contact-link:hover { box-shadow: var(--nm-inset-s); transform: translateY(1px); }
+.contact-link-label {
+  font-family: Georgia, serif; font-size: 0.72rem; font-style: italic;
+  color: var(--text-dim); letter-spacing: 0.06em; margin-bottom: 0.2rem; display: block;
+}
+.contact-link-value { font-family: Georgia, serif; font-size: 0.93rem; color: var(--text); }
+
+/* ── Footer ── */
+footer {
+  padding: 2.5rem 3rem; border-top: 1px solid var(--bg-deep);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 1rem;
+}
+.footer-logo { font-family: Georgia, serif; font-style: italic; font-size: 0.95rem; color: var(--text-dim); text-decoration: none; }
+.footer-meta { font-family: Georgia, serif; font-size: 0.78rem; font-style: italic; color: var(--text-dim); }
+.footer-back { font-family: Georgia, serif; font-size: 0.78rem; font-style: italic; color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
+.footer-back:hover { color: var(--text); }
+
+/* ── Reveal ── */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
+.reveal.in { opacity: 1; transform: none; }
+
+@media (max-width: 600px) {
+  nav { padding: 0 1.25rem; }
+  .nav-links { gap: 1.5rem; }
+  section { padding: 5rem 0; }
+  footer { flex-direction: column; align-items: flex-start; padding: 2rem 1.25rem; }
+  .philo-item { grid-template-columns: 1fr; gap: 0.25rem; }
+  #mri-canvas-wrap { width: 200px; height: 200px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#home" class="nav-logo">Mastishk</a>
+  <ul class="nav-links">
+    <li><a href="#research">Research</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- ── Hero ── -->
+<section id="home">
+  <canvas id="brain-canvas"></canvas>
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow reveal">
+      <span class="dot"></span>
+      Independent · India · Founded 2026
+    </div>
+    <h1 class="reveal">Understanding the brain<br>through <em>artificial intelligence.</em></h1>
+    <p class="hero-sub reveal">An independent research initiative exploring artificial intelligence, medical imaging, and neuroscience — studying how AI might support neurological care in resource-constrained healthcare settings.</p>
+    <div class="hero-actions reveal">
+      <a href="#research" class="btn btn-raised">Explore our direction</a>
+      <a href="#contact" class="btn btn-flat">Contact →</a>
+    </div>
+  </div>
+
+  <div class="canvas-hint">move your cursor to interact</div>
+</section>
+
+<!-- ── Status ── -->
+<div class="wrap reveal" style="margin-bottom: 7rem; padding-top: 1rem;">
+  <div class="status-block">
+    <span class="label">current status</span>
+    <p>Mastishk is currently in the research and refinement stage — reviewing literature, reproducing existing work, studying clinical challenges, and refining the problems we hope to contribute to over the coming years.</p>
+  </div>
+</div>
+
+<!-- ── Philosophy ── -->
+<section>
+  <div class="wrap">
+    <span class="label reveal">research philosophy</span>
+    <h2 class="reveal">How we work</h2>
+    <div class="philo-list" style="margin-top: 2rem;">
+      <div class="philo-item reveal">
+        <span class="philo-num">i.</span>
+        <div><h3>Learn first</h3><p>Before building models, we aim to understand the clinical problem, existing literature, and practical limitations deeply.</p></div>
+      </div>
+      <div class="philo-item reveal">
+        <span class="philo-num">ii.</span>
+        <div><h3>Build carefully</h3><p>Research should prioritize reproducibility, transparency, and realistic evaluation over impressive benchmarks.</p></div>
+      </div>
+      <div class="philo-item reveal">
+        <span class="philo-num">iii.</span>
+        <div><h3>Think long term</h3><p>Our goal is not to publish quickly, but to contribute meaningful work that could eventually benefit healthcare.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Research ── -->
+<section id="research">
+  <div class="wrap">
+    <span class="label reveal">research</span>
+    <h2 class="reveal">Current research direction</h2>
+
+    <div class="inset-box reveal">
+      <span class="research-tag">Research &amp; Literature Review</span>
+      <h3>Ultra-low-field MRI for brain imaging</h3>
+      <p style="margin-top:0.5rem;font-size:0.95rem;">We are exploring the research landscape around ultra-low-field MRI, medical image segmentation, and domain adaptation.</p>
+      <p style="margin-top:1.5rem;font-size:0.8rem;font-style:italic;color:var(--text-dim);letter-spacing:0.06em;">Present work includes</p>
+      <ul class="work-list">
+        <li>Reading current literature</li>
+        <li>Reproducing published methods</li>
+        <li>Studying publicly available datasets</li>
+        <li>Evaluating possible research gaps</li>
+      </ul>
+      <p class="note">No experimental conclusions have been reached yet.</p>
+    </div>
+
+    <!-- MRI Visualiser -->
+    <div class="mri-wrap reveal">
+      <span class="label" style="margin-bottom:1rem;">interactive brain scan</span>
+
+      <div id="mri-canvas-wrap">
+        <canvas id="mri-canvas" width="260" height="260"></canvas>
+      </div>
+
+      <div class="mri-label-row">
+        <span>axial</span>
+        <span id="mri-slice-label" style="font-size:0.65rem;">slice 14 / 28</span>
+        <span>ultra-low-field</span>
+      </div>
+
+      <div class="mri-controls">
+        <button class="mri-btn active" id="btn-axial">axial</button>
+        <button class="mri-btn" id="btn-coronal">coronal</button>
+        <button class="mri-btn" id="btn-sagittal">sagittal</button>
+        <button class="mri-btn" id="btn-play">▶ animate</button>
+      </div>
+
+      <p style="font-size:0.72rem;font-style:italic;color:var(--text-dim);text-align:center;max-width:280px;line-height:1.6;">
+        A procedurally-generated MRI representation. Hover to explore slices. Use controls to switch plane.
+      </p>
+    </div>
+
+    <div class="reveal" style="margin-top:3.5rem;">
+      <span class="label">areas of interest</span>
+      <div class="areas">
+        <span class="area">Brain tumour imaging</span>
+        <span class="area">Medical image segmentation</span>
+        <span class="area">Domain adaptation</span>
+        <span class="area">Trustworthy medical AI</span>
+        <span class="area">Low-resource healthcare technology</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── About ── -->
+<section id="about">
+  <div class="wrap">
+    <span class="label reveal">about</span>
+    <h2 class="reveal">A research notebook<br>becoming a laboratory.</h2>
+    <p class="reveal" style="margin-top:0.5rem;">Mastishk was founded in 2026 as an independent undergraduate research initiative. The project began with a simple question —</p>
+    <div class="quote-block reveal">"How can AI become genuinely useful in healthcare environments where resources are limited?"</div>
+    <p class="reveal">Rather than rushing toward ambitious claims, Mastishk focuses on understanding existing research, identifying meaningful open problems, and building a strong technical foundation before pursuing original contributions.</p>
+
+    <div class="person-row reveal">
+      <div class="avatar">VS</div>
+      <div>
+        <small>Brain behind Mastishk</small>
+        <h3 style="margin-bottom:0.2rem;">Vansh Sharma</h3>
+        <p>Undergraduate student interested in artificial intelligence, medical imaging, and neuroscience. Currently learning, experimenting, and refining research directions.</p>
+      </div>
+    </div>
+
+    <div class="pub-empty reveal">
+      <span class="label">publications</span>
+      <h3>Research Notes</h3>
+      <p style="margin-top:0.6rem;">There are no publications yet. As the initiative grows, this section will document technical notes, literature reviews, implementation logs, and future research outputs.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Contact ── -->
+<section id="contact">
+  <div class="wrap">
+    <span class="label reveal">contact</span>
+    <h2 class="reveal">Exchange ideas, ask questions,<br>or follow the work.</h2>
+    <p class="reveal" style="margin-top:0.5rem;">Whether you're a student, researcher, clinician, or simply curious — I'd be glad to connect.</p>
+    <div class="contact-items reveal">
+      <a href="mailto:vanshsharma.may2007@gmail.com" class="contact-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-dim);flex-shrink:0"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <div><span class="contact-link-label">email</span><span class="contact-link-value">vanshsharma.may2007@gmail.com</span></div>
+      </a>
+      <a href="https://github.com/mastishk-lab" target="_blank" rel="noopener" class="contact-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-dim);flex-shrink:0"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+        <div><span class="contact-link-label">github</span><span class="contact-link-value">github.com/mastishk-lab</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a href="#home" class="footer-logo">Mastishk</a>
+  <span class="footer-meta">Mastishk Lab · India · Founded 2026</span>
+  <a href="#home" class="footer-back">↑ back to top</a>
+</footer>
+
+<script>
+/* =============================================
+   1. BRAIN NETWORK CANVAS — hero background
+   Neumorphic palette: nodes are raised bumps,
+   edges are engraved lines. Mouse warps nearby nodes.
+   ============================================= */
+(function(){
+  const cvs = document.getElementById('brain-canvas');
+  const ctx = cvs.getContext('2d');
+  let W, H, nodes, mouse = {x: -9999, y: -9999};
+  const COUNT = 72, DIST = 140, REPEL = 90;
+
+  function resize(){
+    W = cvs.width  = cvs.offsetWidth;
+    H = cvs.height = cvs.offsetHeight;
+  }
+
+  function mkNode(){
+    return {
+      x: Math.random()*W, y: Math.random()*H,
+      ox: 0, oy: 0,
+      vx: (Math.random()-0.5)*0.3,
+      vy: (Math.random()-0.5)*0.3,
+      r: Math.random()*2.5 + 1.2,
+      pulse: Math.random()*Math.PI*2
+    };
+  }
+
+  function init(){ nodes = Array.from({length:COUNT}, mkNode); }
+
+  function draw(ts){
+    ctx.clearRect(0,0,W,H);
+
+    nodes.forEach(n => {
+      n.pulse += 0.015;
+
+      // soft mouse repel
+      const dx = n.x - mouse.x, dy = n.y - mouse.y;
+      const d = Math.sqrt(dx*dx+dy*dy);
+      if(d < REPEL && d > 0){
+        const force = (REPEL - d) / REPEL * 1.4;
+        n.x += dx/d * force;
+        n.y += dy/d * force;
+      }
+
+      n.x += n.vx; n.y += n.vy;
+      // soft bounce
+      if(n.x < 20) n.vx += 0.05;
+      if(n.x > W-20) n.vx -= 0.05;
+      if(n.y < 20) n.vy += 0.05;
+      if(n.y > H-20) n.vy -= 0.05;
+      n.vx *= 0.99; n.vy *= 0.99;
+    });
+
+    // edges — engraved look: dark line offset slightly
+    for(let i=0;i<nodes.length;i++){
+      for(let j=i+1;j<nodes.length;j++){
+        const a=nodes[i], b=nodes[j];
+        const dx=a.x-b.x, dy=a.y-b.y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<DIST){
+          const alpha = (1-dist/DIST)*0.22;
+          // shadow line (deeper groove)
+          ctx.beginPath();
+          ctx.moveTo(a.x+0.5, a.y+0.5);
+          ctx.lineTo(b.x+0.5, b.y+0.5);
+          ctx.strokeStyle = `rgba(160,157,151,${alpha})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+          // highlight line (raised lip)
+          ctx.beginPath();
+          ctx.moveTo(a.x-0.5, a.y-0.5);
+          ctx.lineTo(b.x-0.5, b.y-0.5);
+          ctx.strokeStyle = `rgba(232,229,223,${alpha*0.9})`;
+          ctx.lineWidth = 0.7;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // nodes — soft raised dot
+    nodes.forEach(n => {
+      const glow = (Math.sin(n.pulse)*0.5+0.5);
+      const r = n.r + glow * 0.7;
+
+      // dark shadow offset
+      ctx.beginPath();
+      ctx.arc(n.x+1.5, n.y+1.5, r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(160,157,151,${0.45 + glow*0.15})`;
+      ctx.fill();
+
+      // light highlight offset
+      ctx.beginPath();
+      ctx.arc(n.x-1, n.y-1, r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(232,229,223,${0.5 + glow*0.15})`;
+      ctx.fill();
+
+      // main dot
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(122,119,115,${0.35 + glow*0.25})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  resize(); init(); draw();
+  window.addEventListener('resize', ()=>{ resize(); });
+
+  document.getElementById('home').addEventListener('mousemove', e=>{
+    const r = cvs.getBoundingClientRect();
+    mouse.x = e.clientX - r.left;
+    mouse.y = e.clientY - r.top;
+  });
+  document.getElementById('home').addEventListener('mouseleave', ()=>{
+    mouse.x = -9999; mouse.y = -9999;
+  });
+  // touch
+  document.getElementById('home').addEventListener('touchmove', e=>{
+    const r = cvs.getBoundingClientRect();
+    mouse.x = e.touches[0].clientX - r.left;
+    mouse.y = e.touches[0].clientY - r.top;
+  }, {passive:true});
+})();
+
+
+/* =============================================
+   2. MRI BRAIN VISUALISER
+   Procedurally draws a brain cross-section using
+   layered ellipses + noise to look like MRI.
+   Hover scrolls through slices, buttons switch plane.
+   ============================================= */
+(function(){
+  const wrap  = document.getElementById('mri-canvas-wrap');
+  const cvs   = document.getElementById('mri-canvas');
+  const ctx   = cvs.getContext('2d');
+  const lbl   = document.getElementById('mri-slice-label');
+  const SLICES = 28;
+  let currentSlice = 14;
+  let plane = 'axial'; // axial | coronal | sagittal
+  let playing = false, playTimer = null;
+  const playBtn = document.getElementById('btn-play');
+
+  // seeded pseudo-random for consistent shape noise
+  function seededRand(seed){
+    let s = seed;
+    return function(){ s = (s*9301+49297)%233280; return s/233280; };
+  }
+
+  function drawBrain(slice, pl){
+    const sz = cvs.width;
+    ctx.clearRect(0,0,sz,sz);
+
+    const cx = sz/2, cy = sz/2;
+    const t = slice / SLICES; // 0..1
+
+    // MRI greyscale palette → neumorphic warm grey tones
+    const bg       = '#CCCAC5';
+    const skull    = '#8A8780';
+    const dura     = '#A0A09A';
+    const csf      = '#C2BFB9';
+    const wm       = '#B0ADA8';  // white matter
+    const gm       = '#9A9792';  // grey matter
+    const ventricle= '#D4D1CB';
+    const deep     = '#7A7773';
+
+    // background (inside circle is already clipped by border-radius)
+    ctx.fillStyle = bg;
+    ctx.fillRect(0,0,sz,sz);
+
+    const rand = seededRand(slice * 7 + (pl==='axial'?0:pl==='coronal'?100:200));
+
+    if(pl === 'axial'){
+      // skull ring
+      const sr = 115 - Math.abs(t-0.5)*40;
+      if(sr > 10){
+        // skull outer
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, sr, sr*0.92, 0, 0, Math.PI*2);
+        ctx.fillStyle = skull;
+        ctx.fill();
+
+        // dura / inner boundary
+        const dr = sr - 8;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy+2, dr, dr*0.92, 0, 0, Math.PI*2);
+        ctx.fillStyle = dura;
+        ctx.fill();
+
+        // CSF layer
+        const cr = dr - 5;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy+2, cr, cr*0.91, 0, 0, Math.PI*2);
+        ctx.fillStyle = csf;
+        ctx.fill();
+
+        // grey matter cortex — wiggly
+        const gR = cr - 4;
+        ctx.beginPath();
+        const steps = 80;
+        for(let i=0;i<=steps;i++){
+          const ang = (i/steps)*Math.PI*2;
+          const noiseR = gR + (rand()-0.5)*7;
+          const noiseRy = gR*0.90 + (rand()-0.5)*5;
+          const px = cx + Math.cos(ang)*noiseR;
+          const py = cy + Math.sin(ang)*noiseRy;
+          i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+        }
+        ctx.closePath();
+        ctx.fillStyle = gm;
+        ctx.fill();
+
+        // white matter core
+        const wr = gR - 14;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, wr, wr*0.88, 0, 0, Math.PI*2);
+        ctx.fillStyle = wm;
+        ctx.fill();
+
+        // lateral ventricles (appear mid-slice)
+        if(t > 0.3 && t < 0.75){
+          const vs = (Math.sin((t-0.3)*Math.PI/0.45)) * 28;
+          // left ventricle
+          ctx.beginPath();
+          ctx.ellipse(cx-18, cy+5, vs*0.55, vs*0.25, -0.3, 0, Math.PI*2);
+          ctx.fillStyle = ventricle;
+          ctx.fill();
+          // right ventricle
+          ctx.beginPath();
+          ctx.ellipse(cx+18, cy+5, vs*0.55, vs*0.25, 0.3, 0, Math.PI*2);
+          ctx.fillStyle = ventricle;
+          ctx.fill();
+          // 3rd ventricle
+          ctx.beginPath();
+          ctx.ellipse(cx, cy+10, vs*0.12, vs*0.35, 0, 0, Math.PI*2);
+          ctx.fillStyle = ventricle;
+          ctx.fill();
+        }
+
+        // corpus callosum (white band, top centre)
+        if(t > 0.35 && t < 0.7){
+          ctx.beginPath();
+          ctx.ellipse(cx, cy-6, 32, 8, 0, 0, Math.PI*2);
+          ctx.fillStyle = wm;
+          ctx.fill();
+        }
+
+        // deep structures (basal ganglia area mid slices)
+        if(t > 0.42 && t < 0.65){
+          ctx.beginPath();
+          ctx.ellipse(cx-22, cy+8, 14, 9, 0.2, 0, Math.PI*2);
+          ctx.fillStyle = deep;
+          ctx.globalAlpha = 0.35;
+          ctx.fill();
+          ctx.beginPath();
+          ctx.ellipse(cx+22, cy+8, 14, 9, -0.2, 0, Math.PI*2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // sulci lines (gyri/sulci on surface)
+        ctx.strokeStyle = dura;
+        ctx.lineWidth = 1.2;
+        for(let i=0;i<8;i++){
+          const ang = (i/8)*Math.PI*2 + rand()*0.4;
+          const len = 14 + rand()*10;
+          const rStart = cr - 6;
+          ctx.beginPath();
+          ctx.moveTo(cx+Math.cos(ang)*rStart, cy+Math.sin(ang)*rStart*0.91);
+          ctx.lineTo(cx+Math.cos(ang)*(rStart-len), cy+Math.sin(ang)*(rStart-len)*0.91);
+          ctx.globalAlpha = 0.5;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+      } else {
+        // top/bottom slices — just small oval
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, 35, 28, 0, 0, Math.PI*2);
+        ctx.fillStyle = skull;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, 24, 18, 0, 0, Math.PI*2);
+        ctx.fillStyle = gm;
+        ctx.fill();
+      }
+
+    } else if(pl === 'coronal'){
+      // coronal — brain seen from front
+      const hw = 95 - Math.abs(t-0.5)*50;
+      const hh = hw * 1.15;
+      if(hw > 10){
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, hw, hh, 0, 0, Math.PI*2);
+        ctx.fillStyle = skull; ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, hw-7, hh-7, 0, 0, Math.PI*2);
+        ctx.fillStyle = gm; ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, hw-18, hh-18, 0, 0, Math.PI*2);
+        ctx.fillStyle = wm; ctx.fill();
+        // interhemispheric fissure
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - hh+18); ctx.lineTo(cx, cy+hh*0.3);
+        ctx.strokeStyle = csf; ctx.lineWidth = 3; ctx.stroke();
+        // lateral sulci
+        for(let i=0;i<6;i++){
+          const ang = (i/6)*Math.PI*2;
+          ctx.beginPath();
+          const r1=hw-10, r2=hw-22;
+          ctx.moveTo(cx+Math.cos(ang)*r1, cy+Math.sin(ang)*r1*1.15);
+          ctx.lineTo(cx+Math.cos(ang)*r2, cy+Math.sin(ang)*r2*1.15);
+          ctx.strokeStyle=dura; ctx.lineWidth=1; ctx.globalAlpha=0.5; ctx.stroke(); ctx.globalAlpha=1;
+        }
+        if(t>0.3&&t<0.75){
+          const vs=(Math.sin((t-0.3)*Math.PI/0.45))*22;
+          ctx.beginPath(); ctx.ellipse(cx-16,cy,vs*0.4,vs*0.55,0,0,Math.PI*2); ctx.fillStyle=ventricle; ctx.fill();
+          ctx.beginPath(); ctx.ellipse(cx+16,cy,vs*0.4,vs*0.55,0,0,Math.PI*2); ctx.fill();
+        }
+      }
+
+    } else {
+      // sagittal — brain from the side
+      const hw = 110 - Math.abs(t-0.5)*60;
+      const hh = hw * 0.85;
+      if(hw > 10){
+        // teardrop brain shape
+        ctx.beginPath();
+        ctx.moveTo(cx-hw*0.6, cy);
+        ctx.bezierCurveTo(cx-hw*0.6, cy-hh, cx+hw*0.5, cy-hh*1.1, cx+hw*0.55, cy);
+        ctx.bezierCurveTo(cx+hw*0.5, cy+hh*0.6, cx-hw*0.2, cy+hh*0.7, cx-hw*0.6, cy);
+        ctx.closePath();
+        ctx.fillStyle = skull; ctx.fill();
+        // shrink
+        ctx.save(); ctx.translate(cx, cy); ctx.scale(0.87,0.87); ctx.translate(-cx,-cy);
+        ctx.beginPath();
+        ctx.moveTo(cx-hw*0.6, cy);
+        ctx.bezierCurveTo(cx-hw*0.6, cy-hh, cx+hw*0.5, cy-hh*1.1, cx+hw*0.55, cy);
+        ctx.bezierCurveTo(cx+hw*0.5, cy+hh*0.6, cx-hw*0.2, cy+hh*0.7, cx-hw*0.6, cy);
+        ctx.closePath(); ctx.fillStyle=gm; ctx.fill(); ctx.restore();
+        ctx.save(); ctx.translate(cx, cy); ctx.scale(0.73,0.73); ctx.translate(-cx,-cy);
+        ctx.beginPath();
+        ctx.moveTo(cx-hw*0.6, cy);
+        ctx.bezierCurveTo(cx-hw*0.6, cy-hh, cx+hw*0.5, cy-hh*1.1, cx+hw*0.55, cy);
+        ctx.bezierCurveTo(cx+hw*0.5, cy+hh*0.6, cx-hw*0.2, cy+hh*0.7, cx-hw*0.6, cy);
+        ctx.closePath(); ctx.fillStyle=wm; ctx.fill(); ctx.restore();
+        // corpus callosum arc
+        ctx.beginPath();
+        ctx.arc(cx-10, cy+5, 32, Math.PI*1.1, Math.PI*2, false);
+        ctx.strokeStyle=wm; ctx.lineWidth=7; ctx.stroke();
+        // cerebellum bump
+        ctx.beginPath();
+        ctx.ellipse(cx+hw*0.35, cy+hh*0.48, 22, 17, 0.4, 0, Math.PI*2);
+        ctx.fillStyle=gm; ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(cx+hw*0.35, cy+hh*0.48, 14, 10, 0.4, 0, Math.PI*2);
+        ctx.fillStyle=wm; ctx.fill();
+        // brainstem
+        ctx.beginPath();
+        ctx.ellipse(cx+hw*0.18, cy+hh*0.65, 10, 22, 0.15, 0, Math.PI*2);
+        ctx.fillStyle=deep; ctx.globalAlpha=0.5; ctx.fill(); ctx.globalAlpha=1;
+      }
+    }
+
+    // subtle scanline overlay — MRI feel
+    for(let y=0; y<sz; y+=4){
+      ctx.fillStyle = 'rgba(160,157,151,0.04)';
+      ctx.fillRect(0, y, sz, 1);
+    }
+
+    lbl.textContent = `slice ${String(slice).padStart(2,'0')} / ${SLICES}`;
+  }
+
+  drawBrain(currentSlice, plane);
+
+  // hover to scrub slices
+  wrap.addEventListener('mousemove', e=>{
+    if(playing) return;
+    const r = wrap.getBoundingClientRect();
+    const nx = (e.clientX - r.left) / r.width;
+    currentSlice = Math.max(1, Math.min(SLICES, Math.round(nx * SLICES)));
+    drawBrain(currentSlice, plane);
+  });
+
+  // plane buttons
+  function setPlane(p){
+    plane = p;
+    document.querySelectorAll('.mri-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('btn-'+p).classList.add('active');
+    currentSlice = Math.round(SLICES/2);
+    drawBrain(currentSlice, plane);
+  }
+  document.getElementById('btn-axial').addEventListener('click', ()=>setPlane('axial'));
+  document.getElementById('btn-coronal').addEventListener('click', ()=>setPlane('coronal'));
+  document.getElementById('btn-sagittal').addEventListener('click', ()=>setPlane('sagittal'));
+
+  // play/pause animation
+  playBtn.addEventListener('click', ()=>{
+    playing = !playing;
+    playBtn.textContent = playing ? '⏸ pause' : '▶ animate';
+    if(playing){
+      playBtn.classList.add('active');
+      let s = 1;
+      playTimer = setInterval(()=>{
+        s = s >= SLICES ? 1 : s+1;
+        currentSlice = s;
+        drawBrain(s, plane);
+      }, 80);
+    } else {
+      playBtn.classList.remove('active');
+      clearInterval(playTimer);
+    }
+  });
+})();
+
+
+/* ── Scroll reveal ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
